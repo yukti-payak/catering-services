@@ -29,7 +29,7 @@ export default function LandingPage() {
 
           <p className="text-xl text-gray-500 mb-10 max-w-2xl mx-auto">
             From intimate gatherings to grand celebrations, we connect you with
-            the finest caterers in the city to make your events unforgettable.
+            the finest caterers in the city to make your events unforgettable
           </p>
 
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
