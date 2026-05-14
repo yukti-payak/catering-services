@@ -37,7 +37,7 @@ export default function LandingPage() {
               href="/caterers"
               className="bg-orange-600 text-white text-lg px-10 py-4 rounded-2xl font-bold shadow-xl shadow-orange-200 hover:bg-orange-700 hover:-translate-y-1 transition-all"
             >
-              Explore Caterers
+              Explore Caterers.
             </Link>
           </div>
         </div>
