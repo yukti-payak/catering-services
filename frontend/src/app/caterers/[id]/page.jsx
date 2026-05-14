@@ -14,7 +14,7 @@ export default function CatererDetails() {
       .catch(err => console.error(err));
   }, [id]);
 
-  if (!caterer) return <div className="p-10 text-center text-gray-600">Loading details...</div>;
+  if (!caterer) return <div className="p-10 text-center text-gray-600">Loading details....</div>;
 
   return (
     <div className="min-h-screen bg-gray-50 py-12 px-6">
