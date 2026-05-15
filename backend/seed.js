@@ -6,14 +6,14 @@ dotenv.config();
 
 const dummyData = [
   {
-    name: "Royal Feast Caterers",
+    name: "Royal Feast Caterers.",
     location: "Andheri West, Mumbai",
     pricePerPlate: 450,
     cuisines: ["North Indian", "Chinese", "Continental"],
     rating: 4.5,
   },
   {
-    name: "Spice Route Events",
+    name: "Spice Route Events.",
     location: "Bandra East, Mumbai",
     pricePerPlate: 850,
     cuisines: ["Mughlai", "Awadhi", "Italian"],
