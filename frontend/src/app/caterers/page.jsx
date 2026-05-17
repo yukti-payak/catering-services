@@ -10,6 +10,7 @@ export default function CaterersPage() {
 
   useEffect(() => {
 //fetch data from backend
+    function fetchData(){
     fetch('https://catering-services.onrender.com/api/caterers')
       .then((res) => res.json())
       .then((data) => {
@@ -17,6 +18,9 @@ export default function CaterersPage() {
         setLoading(false);
       })
       .catch((err) => console.error("Error fetching data:", err));
+    }
+
+    fetchData()
   }, []);
 
   const filteredCaterers = caterers.filter((c) => 
