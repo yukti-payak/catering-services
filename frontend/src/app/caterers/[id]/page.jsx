@@ -1,64 +1,153 @@
 "use client";
-import { useEffect, useState } from 'react';
-import { useParams } from 'next/navigation';
-import Link from 'next/link';
+
+import { useEffect, useState } from "react";
+import { useParams } from "next/navigation";
+import Link from "next/link";
 
 export default function CatererDetails() {
   const { id } = useParams();
+
   const [caterer, setCaterer] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
 
   useEffect(() => {
-    fetch(`https://catering-services.onrender.com/api/caterers/${id}`)
-      .then(res => res.json())
-      .then(data => setCaterer(data))
-      .catch(err => console.error(err));
+    const fetchCaterer = async () => {
+      try {
+        setLoading(true);
+
+        const response = await fetch(
+          `https://catering-services.onrender.com/api/caterers/${id}`
+        );
+
+        if (!response.ok) {
+          throw new Error("Failed to fetch caterer details");
+        }
+
+        const data = await response.json();
+        setCaterer(data);
+      } catch (err) {
+        console.error(err);
+        setError(err.message || "Something went wrong");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    if (id) {
+      fetchCaterer();
+    }
   }, [id]);
 
-  if (!caterer) return <div className="p-10 text-center text-gray-600">Loading details....</div>;
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gray-50">
+        <p className="text-lg font-medium text-gray-600">
+          Loading details...
+        </p>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gray-50">
+        <p className="text-lg font-medium text-red-500">{error}</p>
+      </div>
+    );
+  }
+
+  if (!caterer) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gray-50">
+        <p className="text-lg font-medium text-gray-500">
+          Caterer not found
+        </p>
+      </div>
+    );
+  }
 
   return (
-    <div className="min-h-screen bg-gray-50 py-12 px-6">
-      <div className="max-w-3xl mx-auto">
-        <Link href="/caterers" className="text-orange-600 hover:text-orange-700 font-medium mb-8 inline-block">
+    <section className="min-h-screen bg-gray-50 py-12 px-4">
+      <div className="max-w-4xl mx-auto">
+        <Link
+          href="/caterers"
+          className="inline-flex items-center gap-2 mb-8 text-orange-600 hover:text-orange-700 font-medium transition"
+        >
           ← Back to Search
         </Link>
-        
-        <div className="bg-white p-8 md:p-12 rounded-3xl shadow-sm border border-gray-100">
-          <div className="flex justify-between items-start mb-6">
-            <div>
-              <h1 className="text-4xl font-bold text-gray-900 mb-2">{caterer.name}</h1>
-              <p className="text-lg text-gray-500">📍 {caterer.location}</p>
-            </div>
-            <span className="bg-yellow-100 text-yellow-700 px-4 py-2 rounded-full font-bold">
-              ⭐ {caterer.rating}
-            </span>
-          </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-10">
-            <div className="bg-orange-50 p-6 rounded-2xl">
-              <p className="text-sm text-orange-600 font-semibold uppercase tracking-wider">Price Per Plate</p>
-              <p className="text-3xl font-extrabold text-gray-900">₹{caterer.pricePerPlate}</p>
-            </div>
-            <div className="bg-blue-50 p-6 rounded-2xl">
-              <p className="text-sm text-blue-600 font-semibold uppercase tracking-wider">Status</p>
-              <p className="text-3xl font-extrabold text-gray-900">Available</p>
+        <div className="bg-white rounded-3xl shadow-md border border-gray-100 overflow-hidden">
+          <div className="p-8 border-b border-gray-100">
+            <div className="flex flex-col md:flex-row md:items-start md:justify-between gap-4">
+              <div>
+                <h1 className="text-4xl font-bold text-gray-900">
+                  {caterer.name}
+                </h1>
+
+                <p className="mt-2 text-gray-500 text-lg">
+                  📍 {caterer.location}
+                </p>
+              </div>
+
+              <div className="bg-yellow-100 text-yellow-700 px-5 py-2 rounded-full font-bold text-lg w-fit">
+                ⭐ {caterer.rating}
+              </div>
             </div>
           </div>
 
-          <h3 className="text-xl font-bold text-gray-800 mb-4">Cuisines Offered</h3>
-          <div className="flex flex-wrap gap-3">
-            {caterer.cuisines?.map(item => (
-              <span key={item} className="bg-gray-100 text-gray-700 px-5 py-2 rounded-full text-sm font-medium border border-gray-200">
-                {item}
-              </span>
-            ))}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 p-8">
+            <InfoCard
+              title="Price Per Plate"
+              value={`₹${caterer.pricePerPlate}`}
+              bg="bg-orange-50"
+              text="text-orange-600"
+            />
+
+            <InfoCard
+              title="Availability"
+              value="Available"
+              bg="bg-blue-50"
+              text="text-blue-600"
+            />
           </div>
 
-          <button className="w-full mt-10 bg-orange-600 text-white font-bold py-4 rounded-xl hover:bg-orange-700 transition-colors shadow-lg shadow-orange-200">
-            Contact Caterer
-          </button>
+          <div className="px-8 pb-8">
+            <h2 className="text-2xl font-bold text-gray-800 mb-5">
+              Cuisines Offered
+            </h2>
+
+            <div className="flex flex-wrap gap-3">
+              {caterer.cuisines?.map((cuisine) => (
+                <span
+                  key={cuisine}
+                  className="px-5 py-2 rounded-full bg-gray-100 border border-gray-200 text-gray-700 text-sm font-medium hover:bg-orange-100 hover:text-orange-700 transition"
+                >
+                  {cuisine}
+                </span>
+              ))}
+            </div>
+
+            <button className="w-full mt-10 bg-orange-600 hover:bg-orange-700 text-white font-bold py-4 rounded-2xl transition duration-300 shadow-lg shadow-orange-200">
+              Contact Caterer
+            </button>
+          </div>
         </div>
       </div>
+    </section>
+  );
+}
+
+function InfoCard({ title, value, bg, text }) {
+  return (
+    <div className={`${bg} p-6 rounded-2xl`}>
+      <p className={`text-sm font-semibold uppercase tracking-wider ${text}`}>
+        {title}
+      </p>
+
+      <h3 className="mt-2 text-3xl font-extrabold text-gray-900">
+        {value}
+      </h3>
     </div>
   );
 }
