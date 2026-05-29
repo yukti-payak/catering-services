@@ -6,7 +6,7 @@ import Link from 'next/link';
 export default function CaterersPage() {
   const [caterers, setCaterers] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
-  const [maxPrice, setMaxPrice] = useState(1500);
+const [sortBy, setSortBy] = useState("");
   const [isLoading, setIsLoading] = useState(true);
 
   // Optimized async/await fetch
@@ -27,14 +27,24 @@ export default function CaterersPage() {
     loadCaterers();
   }, []);
 
-  // Performance optimization using useMemo for filtering logic
-  const filteredCaterers = useMemo(() => {
-    return caterers.filter((item) => {
-      const matchesName = item.name.toLowerCase().includes(searchTerm.toLowerCase());
-      const matchesPrice = item.pricePerPlate <= Number(maxPrice);
-      return matchesName && matchesPrice;
-    });
-  }, [caterers, searchTerm, maxPrice]);
+// Performance optimized filtering and inline sorting execution
+const filteredCaterers = useMemo(() => {
+
+  const matchedItems = caterers.filter((item) => {
+    return item.name.toLowerCase().includes(searchTerm.toLowerCase());
+  });
+
+
+  let items = [...matchedItems];
+
+  if (sortBy === "asc") {
+    items.sort((a, b) => a.pricePerPlate - b.pricePerPlate);
+  } else if (sortBy === "desc") {
+    items.sort((a, b) => b.pricePerPlate - a.pricePerPlate);
+  }
+
+  return items;
+}, [caterers, searchTerm, sortBy]);
 
   if (isLoading) {
     return (
@@ -52,8 +62,9 @@ export default function CaterersPage() {
           <p className="text-slate-500 mt-2">Discover the perfect taste for your special event</p>
         </header>
 
-        {/* Filters Section */}
+      {/* Filters Section */}
         <section className="bg-white p-6 rounded-2xl shadow-sm flex flex-col md:flex-row gap-6 mb-10 items-center border border-slate-100">
+          {/* Search Bar Input Container */}
           <div className="w-full md:w-1/2">
             <input 
               type="text" 
@@ -64,20 +75,35 @@ export default function CaterersPage() {
             />
           </div>
           
-          <div className="flex flex-col w-full md:w-1/2">
-            <div className="flex justify-between text-sm font-semibold text-slate-600 mb-2">
-              <span>Max Price per Plate:</span>
-              <span className="text-orange-600 font-bold">₹{maxPrice}</span>
+          
+          <div className="w-full md:w-1/2 flex flex-col sm:flex-row items-start sm:items-center justify-end gap-3">
+            <span className="text-sm font-semibold text-slate-500 whitespace-nowrap">Sort by Price:</span>
+            
+            <div className="flex gap-2 w-full sm:w-auto">
+              <button
+                type="button"
+                onClick={() => setSortBy("asc")}
+                className={`flex-1 sm:flex-none px-5 py-2.5 text-sm font-bold rounded-xl transition-all duration-200 ${
+                  sortBy === "asc"
+                    ? "bg-orange-600 text-white shadow-md shadow-orange-200"
+                    : "bg-slate-50 text-slate-700 hover:bg-slate-100 border border-slate-200"
+                }`}
+              >
+                Low to High
+              </button>
+
+              <button
+                type="button"
+                onClick={() => setSortBy("desc")}
+                className={`flex-1 sm:flex-none px-5 py-2.5 text-sm font-bold rounded-xl transition-all duration-200 ${
+                  sortBy === "desc"
+                    ? "bg-orange-600 text-white shadow-md shadow-orange-200"
+                    : "bg-slate-50 text-slate-700 hover:bg-slate-100 border border-slate-200"
+                }`}
+              >
+                High to Low
+              </button>
             </div>
-            <input 
-              type="range" 
-              min="200" 
-              max="2000" 
-              step="50" 
-              value={maxPrice}
-              onChange={(e) => setMaxPrice(Number(e.target.value))}
-              className="w-full h-2 bg-slate-200 rounded-lg appearance-none cursor-pointer accent-orange-500"
-            />
           </div>
         </section>
 
